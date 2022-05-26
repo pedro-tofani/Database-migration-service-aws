@@ -7,15 +7,15 @@ The database migration task runs every two minutes and uses a full load and CDC 
 
 ##### Infrastructure:
 * S3 bucket: where the parquet files are stored
-* RDS instance: a postgres instance that the data will be copied from. To populate the database the script "insert.py" should be executed. It is tresponsible for connecting to the instance and the insert random data to the database.
+* RDS instance: a postgres instance that the data will be copied from. To populate the database the script "insert.py" should be executed. It is responsible for connecting to the instance and insert random data to the database.
 * DMS instance: a database migration service that will be used to copy the data from the RDS instance to the S3 bucket.
 
 ##### Possible scenarios:
-We discussed discussed three scenarios that could be done to perform the database duplication.
+We discussed three scenarios that could be done to perform the database duplication.
 * Scenario 1:
   Get the data from the RDS instance and just create a simple copy of the data to another RDS instance.
-  In real projects this scenario would work for small amount of that and few people using tools for querying the database replica.
-  Has the advantage of being cheap, but becomes as the amount of data grows it is harder to scale (vertical scaling) and the queries are too slow.
+  In real projects this scenario would work for small amount of data and few people using tools for querying the database replica.
+  Has the advantage of being cheap, but as the amount of data grows it is harder to scale (vertical scaling) and the queries are too slow.
 
 ![scenario1](scenario1.png)
 
@@ -27,12 +27,12 @@ We discussed discussed three scenarios that could be done to perform the databas
 ![scenario2](scenario2.png)
 
 * Scenario 3:
-  Get the data from the RDS instance and using a DMS task save the parquet generated files in S3. Storing files in S3 is cheap. These files are flexible and can be read and analysed by different tools as Spark, AWS Athena, AWS Redshift Spectrum. This uncouple the storage (S3) and computing processing (tools mentioned before), making it possible to optimize resources/costs.
+  Get the data from the RDS instance and using a DMS task save it as parquet files in S3. Storing files in S3 is cheap. These files are flexible and can be read and analysed by different tools as Spark, AWS Athena, AWS Redshift Spectrum. This uncouple the storage (S3) and computing processing (tools mentioned before), making it possible to optimize resources/costs.
 
 ![scenario3](scenario3.png)
 ![dms_diagram](dms_diagram.png)
 
-For this project we have chosen Scenario 3. The amount of data we have does not justify it, but we can use it for educational pourposes.
+For this project we have chosen Scenario 3. The amount of data we have does not justify it, but we used it for educational pourposes.
 
 Database migration can be done in three different ways:
 * Full load: every time the tasks runs it copies all the data from the database.
@@ -79,4 +79,3 @@ Here, for example, we first inserted 28 rows (full load) and as the insert.py sc
 
 Verifying the S3 bucket we can see the parquet files that represents the data migrated. In this example we first have a full load file "LOAD00000001.parquet" and then the other files that represents files originated from the CDC operation.
 ![s3](s3.png)
-
