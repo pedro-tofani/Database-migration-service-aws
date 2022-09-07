@@ -17,20 +17,20 @@ We discussed three scenarios that could be done to perform the database duplicat
   In real projects this scenario would work for small amount of data and few people using tools for querying the database replica.
   Has the advantage of being cheap, but as the amount of data grows it is harder to scale (vertical scaling) and the queries are too slow.
 
-![scenario1](scenario1.png)
+![scenario1](images/scenario1.png)
 
 * Scenario 2:
   Get the data from the RDS instance and create a script to ETL the data to a Data Warehouse, like an instance of AWS Redshift.
   In real projects this scenario would work for large amount of data and many people using tools for querying the data warehouse.
   It is fast, horizontally scalable but can be expensive. Using AWS Redshift we have storage and computer processing tied together at the same resource.
 
-![scenario2](scenario2.png)
+![scenario2](images/scenario2.png)
 
 * Scenario 3:
   Get the data from the RDS instance and using a DMS task save it as parquet files in S3. Storing files in S3 is cheap. These files are flexible and can be read and analysed by different tools as Spark, AWS Athena, AWS Redshift Spectrum. This uncouple the storage (S3) and computing processing (tools mentioned before), making it possible to optimize resources/costs.
 
-![scenario3](scenario3.png)
-![dms_diagram](dms_diagram.png)
+![scenario3](images/scenario3.png)
+![dms_diagram](images/dms_diagram.png)
 
 For this project we have chosen Scenario 3. The amount of data we have does not justify it, but we used it for educational pourposes.
 
@@ -39,7 +39,7 @@ Database migration can be done in three different ways:
 * Change Data Capture (CDC): every time the tasks runs it copies all the data that is new after the last time the task ran. It is possible because the RDS keeps an log of all the changes.
 * Full load + CDC: it combines the two previous methods. First it copies all the data and then it would copy only the changes.
 
-![dms_types](dms_types.png)
+![dms_types](images/dms_types.png)
 
 ## Tecnologies and tools used
 * Language: Python 3.8
@@ -71,11 +71,11 @@ python3 insert.py
 This will insert random data to the RDS instance that we created.
 Start the database migration task at AWS DMS section.
 
-![task_status](task_status.png)
+![task_status](images/task_status.png)
 
 Verify the table migration statistics:
-![cpTable](cpTable.png)
+![cpTable](images/cpTable.png)
 Here, for example, we first inserted 28 rows (full load) and as the insert.py script keeps inserting records to the RDS instance more rows are copied usig CDC.
 
 Verifying the S3 bucket we can see the parquet files that represents the data migrated. In this example we first have a full load file "LOAD00000001.parquet" and then the other files that represents files originated from the CDC operation.
-![s3](s3.png)
+![s3](images/s3.png)
